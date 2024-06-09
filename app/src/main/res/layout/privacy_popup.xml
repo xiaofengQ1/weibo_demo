@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/radius2"
+    >
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:text="声明与条款"
+        android:textSize="18dp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:background="@drawable/radius"
+
+        />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="76dp"
+        android:id="@+id/frame_9"
+        android:text="欢迎使用 iH微博，我们将严格遵守相关法律和隐私政策保护您的个人隐私，请您阅读并同意《用户协议》与《隐私政策》"
+        android:textSize="14dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:background="@color/white"
+        android:layout_gravity="center"
+        />
+
+    <TextView
+        android:id="@+id/frame_6"
+        android:layout_width="match_parent"
+        android:layout_height="51dp"
+        android:text="不同意"
+        android:textSize="14dp"
+        android:textColor="@color/gray"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:background="@color/white"
+        />
+
+    <TextView
+        android:id="@+id/frame_7"
+        android:layout_width="match_parent"
+        android:layout_height="53dp"
+        android:text="同意并使用"
+        android:textSize="16dp"
+        android:gravity="center"
+        android:background="@drawable/radius_blue"
+        android:layout_gravity="center"
+        />
+
+</LinearLayout>

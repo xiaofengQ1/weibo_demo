@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Weibo_zhuyufeng</string>
+    <string name="IHWeiBo">IH微博</string>
+    <string name="frame4_2">发你想说</string>
+    <string name="IhRecommend">IH推荐</string>
+    <string name="my">我的</string>
+    <string name="recommend">推荐</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="log">登陆账号</string>
+    <string name="phone">输入手机号</string>
+    <string name="verification_code">输入验证码</string>
+    <string name="getCode">获取验证码</string>
+    <string name="log2">立即登陆</string>
+</resources>
