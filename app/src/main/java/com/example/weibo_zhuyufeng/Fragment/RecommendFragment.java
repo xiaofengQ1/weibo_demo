@@ -74,6 +74,7 @@ public class RecommendFragment extends Fragment {
     private SwipeRefreshLayout swipeRefreshLayout;
     private static final String PREF_WEIBO_LIST = "weibo_list";
     private int current = 1;
+    TextView failText;
 
     private ConnectivityManager.NetworkCallback networkCallback;
     @Override
@@ -87,7 +88,6 @@ public class RecommendFragment extends Fragment {
         EventBus.getDefault().unregister(this);
         unregisterNetworkCallback();
     }
-
     private void registerNetworkCallback() {
         ConnectivityManager connectivityManager = (ConnectivityManager) requireActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connectivityManager != null) {
@@ -116,20 +116,15 @@ public class RecommendFragment extends Fragment {
                     }
                 });
             }
-
             @Override
             public void onLost(@NonNull Network network) {
                 super.onLost(network);
-                // 网络连接丢失时的处理逻辑
-                // 这里可以根据需要添加网络丢失时的处理
                 load();
             }
         };
-
         // 注册 NetworkCallback
         registerNetworkCallback();
     }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -138,15 +133,13 @@ public class RecommendFragment extends Fragment {
         linearLayout1 = view.findViewById(R.id.recommend_linear1);
         linearLayout2 = view.findViewById(R.id.recommend_linear2);
         linearLayout3 = view.findViewById(R.id.recommend_linear3);
+        failText = view.findViewById(R.id.fail_text2);
         recyclerView = view.findViewById(R.id.recycler_view_container);
         weiboInfoList.clear();
         sharedPreferences = requireActivity().getSharedPreferences(LOGIN_STATUS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean("isFirstRun", false);
-        editor.apply();
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout);
-        load();
         handler = new Handler(new Handler.Callback() {
             @Override
             public boolean handleMessage(@NotNull Message msg) {
@@ -163,17 +156,54 @@ public class RecommendFragment extends Fragment {
                         homeAdapter.notifyDataSetChanged();
                     }
                     return true;
+                }else if (msg.what == 3) {
+                    List<WeiboInfo> list = loadWeiboList(getContext());
+                    weiboInfoList.clear();
+                    weiboInfoList.addAll(list);
+                    homeAdapter = new HomeAdapter(weiboInfoList);
+                    recyclerView.setAdapter(homeAdapter);
+                }else if (msg.what == 4) {
+                    meiwang.setVisibility(View.GONE);
+                    swipeRefreshLayout.setEnabled(true);
+                }else if (msg.what == 5) {
+                    swipeRefreshLayout.setEnabled(false);
+                }else if (msg.what == 6) {
+                    List<WeiboInfo> list = loadWeiboList(getContext());
+                    weiboInfoList.clear();
+                    weiboInfoList.addAll(list);
+                    homeAdapter = new HomeAdapter(weiboInfoList);
+                    recyclerView.setAdapter(homeAdapter);
+                    linearLayout3.setVisibility(View.VISIBLE);
+                    linearLayout2.setVisibility(View.GONE);
+                    meiwang.setVisibility(View.VISIBLE);
+                }else if (msg.what == 7) {
+                    linearLayout3.setVisibility(View.GONE);
+                    linearLayout2.setVisibility(View.VISIBLE);
+                    meiwang.setVisibility(View.VISIBLE);
+                }else if (msg.what == 8) {
+                    Collections.shuffle(weiboInfoList);
+                    homeAdapter.notifyDataSetChanged();
+                    saveWeiboList(requireContext(), weiboInfoList);
+                    swipeRefreshLayout.setRefreshing(false);
                 }
                 return true;
             }
         });
+        failText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("yyy", "onClick: ");
+                if (checkNetworkStatus(getContext())) {
+                    linearLayout2.setVisibility(View.GONE);
+                    linearLayout3.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+        load();
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                Collections.shuffle(weiboInfoList);
-                homeAdapter.notifyDataSetChanged();
-                saveWeiboList(requireContext(), weiboInfoList);
-                swipeRefreshLayout.setRefreshing(false);
+                refreshGetData(1, 10);
             }
         });
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -187,6 +217,8 @@ public class RecommendFragment extends Fragment {
                 }
             }
         });
+        editor.putBoolean("isFirstRun", false);
+        editor.apply();
         return view;
     }
     public static void saveWeiboList(Context context, List<WeiboInfo> weiboList) {
@@ -229,62 +261,41 @@ public class RecommendFragment extends Fragment {
                         linearLayout2.setVisibility(View.VISIBLE);
                     }
                 }
-            }, 5000);
+            }, 2000);
         }else {
             if (checkNetworkStatus(getContext())) {
-                meiwang.setVisibility(View.GONE);
-                swipeRefreshLayout.setEnabled(true);
+                handler.sendEmptyMessage(4);
                 if (!isLoggedIn || System.currentTimeMillis() > expirationTime) {
                     List<WeiboInfo> list = loadWeiboList(getContext());
                     if (list != null && !list.isEmpty()) {
-                        weiboInfoList.clear();
-                        weiboInfoList.addAll(list);
-                        homeAdapter = new HomeAdapter(weiboInfoList);
-                        recyclerView.setAdapter(homeAdapter);
+                        handler.sendEmptyMessage(3);
                     } else {
                         beforeGetData(1, 10);
                     }
                 } else {
                     String token = sharedPreferences.getString("token", null);
+                    List<WeiboInfo> list = loadWeiboList(getContext());
                     if (token == null) {
-                        List<WeiboInfo> list = loadWeiboList(getContext());
                         if (list != null && !list.isEmpty()) {
-                            weiboInfoList.clear();
-                            weiboInfoList.addAll(list);
-                            homeAdapter = new HomeAdapter(weiboInfoList);
-                            recyclerView.setAdapter(homeAdapter);
+                            handler.sendEmptyMessage(3);
                         }
                         else beforeGetData(1, 10);
                     } else {
-                        List<WeiboInfo> list = loadWeiboList(getContext());
-                        if (list != null && !list.isEmpty()) {
-                            weiboInfoList.clear();
-                            weiboInfoList.addAll(list);
-                            homeAdapter = new HomeAdapter(weiboInfoList);
-                            recyclerView.setAdapter(homeAdapter);
-                        }
-                        else afterGetData(token, 1, 10);
+                        afterGetData(token, 1, 10);
                     }
                 }
-            } else {
-                swipeRefreshLayout.setEnabled(false);
+            }
+            else {
+                handler.sendEmptyMessage(5);
                 List<WeiboInfo> list = loadWeiboList(getContext());
                 if (list != null && !list.isEmpty()) {
-                    weiboInfoList.clear();
-                    weiboInfoList.addAll(list);
-                    homeAdapter = new HomeAdapter(weiboInfoList);
-                    recyclerView.setAdapter(homeAdapter);
-                    linearLayout3.setVisibility(View.VISIBLE);
-                    linearLayout2.setVisibility(View.GONE);
-                    meiwang.setVisibility(View.VISIBLE);
+                    handler.sendEmptyMessage(6);
                 } else {
-                    linearLayout3.setVisibility(View.GONE);
-                    linearLayout2.setVisibility(View.VISIBLE);
+                    handler.sendEmptyMessage(7);
                 }
             }
         }
     }
-
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onLoginEvent(LogMessage event) {
         String token = sharedPreferences.getString("token", null);
@@ -292,36 +303,36 @@ public class RecommendFragment extends Fragment {
     }
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onLogoutEvent(LogoutMessage event) {
-        beforeGetData(1, 10);
+        refreshGetData(1, 10);
     }
 
-    public void firstTime() {
-        linearLayout1.setVisibility(View.VISIBLE);
-        linearLayout2.setVisibility(View.GONE);
-        linearLayout3.setVisibility(View.GONE);
-    }
-    public void secondTime() {
-        linearLayout1.setVisibility(View.GONE);
-        linearLayout2.setVisibility(View.VISIBLE);
-        linearLayout3.setVisibility(View.GONE);
-    }
-    public void thirdTime() {
-        linearLayout1.setVisibility(View.GONE);
-        linearLayout2.setVisibility(View.GONE);
-        linearLayout3.setVisibility(View.VISIBLE);
-        long expirationTime = sharedPreferences.getLong("expirationTime", 0);
-        boolean isLoggedIn = sharedPreferences.getBoolean("isLogin",false);
-        if (!isLoggedIn || System.currentTimeMillis() > expirationTime) {
-            //no
-        } else {
-            String token = sharedPreferences.getString("token", null);
-            if (token == null) {
-                //no
-            }else {
-                //yes
-            }
-        }
-    }
+//    public void firstTime() {
+//        linearLayout1.setVisibility(View.VISIBLE);
+//        linearLayout2.setVisibility(View.GONE);
+//        linearLayout3.setVisibility(View.GONE);
+//    }
+//    public void secondTime() {
+//        linearLayout1.setVisibility(View.GONE);
+//        linearLayout2.setVisibility(View.VISIBLE);
+//        linearLayout3.setVisibility(View.GONE);
+//    }
+//    public void thirdTime() {
+//        linearLayout1.setVisibility(View.GONE);
+//        linearLayout2.setVisibility(View.GONE);
+//        linearLayout3.setVisibility(View.VISIBLE);
+//        long expirationTime = sharedPreferences.getLong("expirationTime", 0);
+//        boolean isLoggedIn = sharedPreferences.getBoolean("isLogin",false);
+//        if (!isLoggedIn || System.currentTimeMillis() > expirationTime) {
+//            //no
+//        } else {
+//            String token = sharedPreferences.getString("token", null);
+//            if (token == null) {
+//                //no
+//            }else {
+//                //yes
+//            }
+//        }
+//    }
     public void beforeGetData(int currentPage, int pageSize) {
         String endpoint = BASE_URL + "/weibo/homePage";
         String url = endpoint + "?current=" + currentPage + "&size=" + pageSize;
@@ -335,7 +346,6 @@ public class RecommendFragment extends Fragment {
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
             }
-
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()) {
@@ -386,6 +396,37 @@ public class RecommendFragment extends Fragment {
                 }
             }
         }).start();
+    }
+    public void refreshGetData(int currentPage, int pageSize) {
+        String endpoint = BASE_URL + "/weibo/homePage";
+        String url = endpoint + "?current=" + currentPage + "&size=" + pageSize;
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder()
+                .url(url)
+                .addHeader("content-type", "application/json")
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+            }
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    String responseData = response.body().string();
+                    Gson gson = new Gson();
+                    WeiboBody weiboBody = gson.fromJson(responseData, WeiboBody.class);
+                    newWeiboInfoList.clear();
+                    newWeiboInfoList = weiboBody.getData().getRecords();
+                    weiboInfoList.clear();
+                    weiboInfoList.addAll(newWeiboInfoList);
+                    Log.d("yyy", weiboInfoList.get(1).getUsername());
+                    handler.sendEmptyMessage(8);
+                } else {
+                    Log.e("getData", "Error: " + response.code() + " " + response.message());
+                }
+            }
+        });
     }
     public void loadGetData(int currentPage, int pageSize) {
         String endpoint = BASE_URL + "/weibo/homePage";

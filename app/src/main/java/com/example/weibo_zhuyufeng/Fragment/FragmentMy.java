@@ -99,7 +99,6 @@ public class FragmentMy extends Fragment {
             }
         }
     }
-
     private void get(String token) {
         new Thread(new Runnable() {
             @Override
@@ -206,7 +205,6 @@ public class FragmentMy extends Fragment {
             }
         });
     }
-
     @Override
     public void onDestroyView() {
         super.onDestroyView();
