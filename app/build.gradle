@@ -43,7 +43,9 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:4.9.3'
     implementation 'com.squareup.okhttp3:okhttp:4.9.0'
     implementation 'com.google.code.gson:gson:2.8.8'
-
-
+    implementation 'org.greenrobot:eventbus:3.2.0'
+//    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.7'
+//    releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:2.7'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
 
 }

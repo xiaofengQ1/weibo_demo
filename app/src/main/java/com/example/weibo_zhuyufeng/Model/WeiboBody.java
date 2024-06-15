@@ -1,9 +1,11 @@
-package com.example.weibo_zhuyufeng;
+package com.example.weibo_zhuyufeng.Model;
 
-public class GetResponse {
+import android.graphics.pdf.PdfDocument;
+
+public class WeiboBody {
     private int code;
     private String meg;
-    private UserInfo userInfo;
+    private WeiboPage data;
 
     public int getCode() {
         return code;
@@ -21,11 +23,11 @@ public class GetResponse {
         this.meg = meg;
     }
 
-    public UserInfo getUserInfo() {
-        return userInfo;
+    public WeiboPage getData() {
+        return data;
     }
 
-    public void setUserInfo(UserInfo userInfo) {
-        this.userInfo = userInfo;
+    public void setData(WeiboPage data) {
+        this.data = data;
     }
 }

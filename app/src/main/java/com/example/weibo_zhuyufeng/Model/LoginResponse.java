@@ -1,4 +1,4 @@
-package com.example.weibo_zhuyufeng;
+package com.example.weibo_zhuyufeng.Model;
 
 import com.google.gson.annotations.SerializedName;
 

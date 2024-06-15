@@ -1,4 +1,4 @@
-package com.example.weibo_zhuyufeng;
+package com.example.weibo_zhuyufeng.Activity;
 
 import android.content.Context;
 import android.content.Intent;
@@ -18,9 +18,10 @@ import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-public class SplashScreen extends AppCompatActivity {
-    private AlertDialog dialog;
+import com.example.weibo_zhuyufeng.R;
 
+public class SplashScreenActivity extends AppCompatActivity {
+    private AlertDialog dialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,9 +35,6 @@ public class SplashScreen extends AppCompatActivity {
         }else {
             startActivity(new Intent(this, HomeActivity.class));
         }
-
-
-
     }
     private void showDialog(SharedPreferences sharedPreferences) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -62,7 +60,7 @@ public class SplashScreen extends AppCompatActivity {
                 editor.putBoolean("isFirstRun", false);
                 editor.apply();
                 dialog.dismiss();
-                startActivity(new Intent(SplashScreen.this, HomeActivity.class));
+                startActivity(new Intent(SplashScreenActivity.this, HomeActivity.class));
             }
         });
         dialog.show();
@@ -74,14 +72,13 @@ public class SplashScreen extends AppCompatActivity {
         ClickableSpan click1 = new ClickableSpan() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(SplashScreen.this, "用户协议", Toast.LENGTH_SHORT).show();
+                Toast.makeText(SplashScreenActivity.this, "用户协议", Toast.LENGTH_SHORT).show();
             }
         };
-
         ClickableSpan click2 = new ClickableSpan() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(SplashScreen.this, "隐私政策", Toast.LENGTH_SHORT).show();
+                Toast.makeText(SplashScreenActivity.this, "隐私政策", Toast.LENGTH_SHORT).show();
             }
         };
 
@@ -98,7 +95,6 @@ public class SplashScreen extends AppCompatActivity {
         textView.setText(spannableString);
         textView.setMovementMethod(LinkMovementMethod.getInstance());
     }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();

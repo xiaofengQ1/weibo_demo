@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".FragmentMy"
+    tools:context=".Fragment.FragmentMy"
     android:orientation="vertical">
 
     <LinearLayout
@@ -35,13 +35,30 @@
             android:gravity="center"
             />
     </LinearLayout>
-    <TextView
+
+    <FrameLayout
+        android:id="@+id/content_container"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:text="登陆后查看"
-        android:textColor="#66000000"
-        android:gravity="center"
-        android:id="@+id/my_text"
-        />
+        android:layout_weight="1">
+
+        <!-- 登录前显示的 TextView 区域 -->
+        <TextView
+            android:id="@+id/my_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="登录后查看"
+            android:textColor="#66000000"
+            android:gravity="center"/>
+
+        <TextView
+            android:id="@+id/my_after_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="暂时无内容"
+            android:textColor="#66000000"
+            android:gravity="center"/>
+
+    </FrameLayout>
+
 </LinearLayout>

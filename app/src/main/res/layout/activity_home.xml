@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".HomeActivity"
+    tools:context=".Activity.HomeActivity"
     android:orientation="vertical">
 
 
@@ -24,15 +24,19 @@
             android:textStyle="bold"
             android:gravity="center"
             android:layout_gravity="center"
+
             />
         <TextView
             android:id="@+id/log_out"
-            android:layout_width="60dp"
+            android:layout_width="100dp"
             android:layout_height="27dp"
             android:layout_gravity="end"
             android:layout_marginRight="30dp"
             android:textColor="@color/blue"
+            android:textSize="15dp"
             android:textStyle="bold"
+            android:gravity="end"
+            android:paddingTop="5dp"
             />
     </androidx.appcompat.widget.Toolbar>
 
@@ -74,13 +78,12 @@
             />
         <TextView
             android:layout_width="match_parent"
-            android:layout_height="16dp"
+            android:layout_height="20dp"
             android:text="@string/recommend"
             android:gravity="center"
             android:id="@+id/recommend_text"
             android:textColor="@color/blue"
             />
-
     </LinearLayout>
 
 
@@ -104,7 +107,7 @@
             />
         <TextView
             android:layout_width="match_parent"
-            android:layout_height="16dp"
+            android:layout_height="20dp"
             android:text="@string/my"
             android:gravity="center"
             android:id="@+id/my_text"

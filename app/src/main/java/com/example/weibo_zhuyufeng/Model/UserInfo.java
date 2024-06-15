@@ -1,4 +1,4 @@
-package com.example.weibo_zhuyufeng;
+package com.example.weibo_zhuyufeng.Model;
 
 public class UserInfo {
     private long id;
@@ -10,7 +10,6 @@ public class UserInfo {
     public long getId() {
         return id;
     }
-
     public void setId(long id) {
         this.id = id;
     }
