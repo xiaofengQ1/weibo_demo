@@ -20,6 +20,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.weibo_zhuyufeng.Activity.LogActivity;
+import com.example.weibo_zhuyufeng.Adapter.CustomOkHttpClient;
 import com.example.weibo_zhuyufeng.Model.LogMessage;
 import com.example.weibo_zhuyufeng.Model.GetResponseBody;
 import com.example.weibo_zhuyufeng.Model.LogoutMessage;

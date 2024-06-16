@@ -17,6 +17,7 @@ import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.weibo_zhuyufeng.Adapter.CustomOkHttpClient;
 import com.example.weibo_zhuyufeng.Model.LogMessage;
 import com.example.weibo_zhuyufeng.Model.LoginResponse;
 import com.example.weibo_zhuyufeng.R;
@@ -196,7 +197,6 @@ public class LogActivity extends AppCompatActivity {
     //登陆
     private void login(String phoneNumber, String verificationCode) {
         OkHttpClient client = new OkHttpClient();
-        // 构建 JSON 格式的请求体
         MediaType JSON = MediaType.parse("application/json; charset=utf-8");
         String json = "{\"phone\": \"" + phoneNumber + "\", \"smsCode\": \"" + verificationCode + "\"}";
         RequestBody requestBody = RequestBody.create(JSON, json);
@@ -295,7 +295,6 @@ public class LogActivity extends AppCompatActivity {
         }
         return sendCount < MAX_SEND_COUNT;
     }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();

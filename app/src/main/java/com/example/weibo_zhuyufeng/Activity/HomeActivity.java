@@ -11,6 +11,8 @@ import android.widget.TextView;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.example.weibo_zhuyufeng.Model.LogMessage;
 import com.example.weibo_zhuyufeng.Fragment.FragmentMy;
@@ -29,7 +31,6 @@ public class HomeActivity extends AppCompatActivity {
     private static String LOGIN_STATUS = "login_status";
     private TextView logOut;
     private TextView toolText;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,6 +95,7 @@ public class HomeActivity extends AppCompatActivity {
                 .add(R.id.fragment_container_view,fragment,null)
                 .commit();
     }
+
     //更换我的或推荐页面
     private void replaceFragment(Fragment fragment){
         Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container_view);
@@ -106,9 +108,6 @@ public class HomeActivity extends AppCompatActivity {
                 .addToBackStack(null)
                 .commit();
     }
-
-
-
     @Override
     protected void onDestroy() {
         super.onDestroy();

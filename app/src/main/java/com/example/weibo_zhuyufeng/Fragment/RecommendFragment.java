@@ -25,6 +25,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.weibo_zhuyufeng.Adapter.CustomOkHttpClient;
 import com.example.weibo_zhuyufeng.Adapter.HomeAdapter;
 import com.example.weibo_zhuyufeng.Model.GetResponseBody;
 import com.example.weibo_zhuyufeng.Model.LogMessage;
@@ -119,7 +120,12 @@ public class RecommendFragment extends Fragment {
             @Override
             public void onLost(@NonNull Network network) {
                 super.onLost(network);
-                load();
+                requireActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        meiwang.setVisibility(View.VISIBLE);
+                    }
+                });
             }
         };
         // 注册 NetworkCallback
@@ -140,11 +146,12 @@ public class RecommendFragment extends Fragment {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout);
+        current = 1;
         handler = new Handler(new Handler.Callback() {
             @Override
             public boolean handleMessage(@NotNull Message msg) {
                 if (msg.what == 1) {
-                    homeAdapter = new HomeAdapter(weiboInfoList);
+                    homeAdapter = new HomeAdapter(weiboInfoList, sharedPreferences);
                     recyclerView.setAdapter(homeAdapter);
                     return true;
                 }
@@ -160,7 +167,7 @@ public class RecommendFragment extends Fragment {
                     List<WeiboInfo> list = loadWeiboList(getContext());
                     weiboInfoList.clear();
                     weiboInfoList.addAll(list);
-                    homeAdapter = new HomeAdapter(weiboInfoList);
+                    homeAdapter = new HomeAdapter(weiboInfoList, sharedPreferences);
                     recyclerView.setAdapter(homeAdapter);
                 }else if (msg.what == 4) {
                     meiwang.setVisibility(View.GONE);
@@ -171,7 +178,7 @@ public class RecommendFragment extends Fragment {
                     List<WeiboInfo> list = loadWeiboList(getContext());
                     weiboInfoList.clear();
                     weiboInfoList.addAll(list);
-                    homeAdapter = new HomeAdapter(weiboInfoList);
+                    homeAdapter = new HomeAdapter(weiboInfoList, sharedPreferences);
                     recyclerView.setAdapter(homeAdapter);
                     linearLayout3.setVisibility(View.VISIBLE);
                     linearLayout2.setVisibility(View.GONE);
@@ -183,7 +190,7 @@ public class RecommendFragment extends Fragment {
                 }else if (msg.what == 8) {
                     Collections.shuffle(weiboInfoList);
                     homeAdapter.notifyDataSetChanged();
-                    saveWeiboList(requireContext(), weiboInfoList);
+                    saveWeiboList(weiboInfoList);
                     swipeRefreshLayout.setRefreshing(false);
                 }
                 return true;
@@ -221,16 +228,16 @@ public class RecommendFragment extends Fragment {
         editor.apply();
         return view;
     }
-    public static void saveWeiboList(Context context, List<WeiboInfo> weiboList) {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+    public void saveWeiboList(List<WeiboInfo> weiboList) {
+        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences(LOGIN_STATUS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         Gson gson = new Gson();
         String json = gson.toJson(weiboList);
         editor.putString(PREF_WEIBO_LIST, json);
         editor.apply();
     }
-    public static List<WeiboInfo> loadWeiboList(Context context) {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+    public List<WeiboInfo> loadWeiboList(Context context) {
+        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences(LOGIN_STATUS, Context.MODE_PRIVATE);
         Gson gson = new Gson();
         String json = sharedPreferences.getString(PREF_WEIBO_LIST, null);
         Type type = new TypeToken<List<WeiboInfo>>() {}.getType();
@@ -266,12 +273,7 @@ public class RecommendFragment extends Fragment {
             if (checkNetworkStatus(getContext())) {
                 handler.sendEmptyMessage(4);
                 if (!isLoggedIn || System.currentTimeMillis() > expirationTime) {
-                    List<WeiboInfo> list = loadWeiboList(getContext());
-                    if (list != null && !list.isEmpty()) {
-                        handler.sendEmptyMessage(3);
-                    } else {
-                        beforeGetData(1, 10);
-                    }
+                    beforeGetData(1, 10);
                 } else {
                     String token = sharedPreferences.getString("token", null);
                     List<WeiboInfo> list = loadWeiboList(getContext());
@@ -306,33 +308,6 @@ public class RecommendFragment extends Fragment {
         refreshGetData(1, 10);
     }
 
-//    public void firstTime() {
-//        linearLayout1.setVisibility(View.VISIBLE);
-//        linearLayout2.setVisibility(View.GONE);
-//        linearLayout3.setVisibility(View.GONE);
-//    }
-//    public void secondTime() {
-//        linearLayout1.setVisibility(View.GONE);
-//        linearLayout2.setVisibility(View.VISIBLE);
-//        linearLayout3.setVisibility(View.GONE);
-//    }
-//    public void thirdTime() {
-//        linearLayout1.setVisibility(View.GONE);
-//        linearLayout2.setVisibility(View.GONE);
-//        linearLayout3.setVisibility(View.VISIBLE);
-//        long expirationTime = sharedPreferences.getLong("expirationTime", 0);
-//        boolean isLoggedIn = sharedPreferences.getBoolean("isLogin",false);
-//        if (!isLoggedIn || System.currentTimeMillis() > expirationTime) {
-//            //no
-//        } else {
-//            String token = sharedPreferences.getString("token", null);
-//            if (token == null) {
-//                //no
-//            }else {
-//                //yes
-//            }
-//        }
-//    }
     public void beforeGetData(int currentPage, int pageSize) {
         String endpoint = BASE_URL + "/weibo/homePage";
         String url = endpoint + "?current=" + currentPage + "&size=" + pageSize;
@@ -431,20 +406,16 @@ public class RecommendFragment extends Fragment {
     public void loadGetData(int currentPage, int pageSize) {
         String endpoint = BASE_URL + "/weibo/homePage";
         String url = endpoint + "?current=" + currentPage + "&size=" + pageSize;
-
         OkHttpClient client = new OkHttpClient();
-
         Request request = new Request.Builder()
                 .url(url)
                 .addHeader("content-type", "application/json")
                 .build();
-
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
             }
-
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()) {
@@ -453,8 +424,6 @@ public class RecommendFragment extends Fragment {
                     WeiboBody weiboBody = gson.fromJson(responseData, WeiboBody.class);
                     newWeiboInfoList.clear();
                     newWeiboInfoList = weiboBody.getData().getRecords();
-//                    weiboInfoList.clear();
-//                    weiboInfoList.addAll(newWeiboInfoList);
                     Log.d("yyy", weiboInfoList.get(1).getUsername());
                     handler.sendEmptyMessage(2);
                 } else {
@@ -466,12 +435,10 @@ public class RecommendFragment extends Fragment {
     //检查网络
     public static boolean checkNetworkStatus(Context context) {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-
         if (connectivityManager != null) {
             NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
             return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
         }
-
         return false;
     }
 }
