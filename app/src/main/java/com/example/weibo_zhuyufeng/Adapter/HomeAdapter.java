@@ -150,6 +150,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.HomeItemHolder
                     holder.btnPlay.setVisibility(View.VISIBLE);
                 }
 
+                //准备完成
                 holder.mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                     @Override
                     public void onPrepared(MediaPlayer mp) {
@@ -188,7 +189,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.HomeItemHolder
                     } else {
                         holder.videoProgress.setVisibility(View.VISIBLE);
                         holder.videoPoster.setVisibility(View.GONE);
-                        holder.btnPlay.setVisibility(View.GONE);
+//                        holder.btnPlay.setVisibility(View.GONE);
 
                         if (holder.mediaPlayer != null) {
                             holder.mediaPlayer.setDisplay(holder.videoSurface.getHolder());
@@ -249,7 +250,6 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.HomeItemHolder
                                 }
                                 // 将图片设置到 ImageView 中
                                 holder.singleImage.setLayoutParams(layoutParams);
-
                                 holder.singleImage.setImageDrawable(resource);
                             }
                             @Override
@@ -299,7 +299,6 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.HomeItemHolder
     }
     private void startProgressUpdater(HomeItemHolder holder) {
         holder.videoProgress.setMax(holder.mediaPlayer.getDuration());
-
         Runnable updater = new Runnable() {
             @Override
             public void run() {
@@ -396,7 +395,6 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.HomeItemHolder
     }
     public void unlikeWeibo(long weiboId, int position) {
         OkHttpClient client = new OkHttpClient();
-
         MediaType mediaType = MediaType.parse("application/json");
         RequestBody requestBody = RequestBody.create(mediaType, "{\"id\": " + weiboId + "}");
         String token = sharedPreferences.getString("token", null);
@@ -407,7 +405,6 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.HomeItemHolder
                 .addHeader("Authorization", "Bearer " + token)
                 .addHeader("Content-Type", "application/json")
                 .build();
-
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onResponse(Call call, Response response) throws IOException {

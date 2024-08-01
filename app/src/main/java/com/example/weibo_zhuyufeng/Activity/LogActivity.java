@@ -47,7 +47,6 @@ public class LogActivity extends AppCompatActivity {
     private static final String PREFS_NAME = "verification_code_prefs";
     private static final String KEY_SEND_COUNT = "send_count";
     private static final String KEY_LAST_SEND_DATE = "last_send_date";
-
     private int countDown = 60;
     private boolean isCountingDown = false;
     private Handler handler;
@@ -65,7 +64,6 @@ public class LogActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_log);
-
         back = findViewById(R.id.back);
         logText = findViewById(R.id.confirm_log);
         getCode = findViewById(R.id.getCode);
